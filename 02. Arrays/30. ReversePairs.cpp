@@ -92,7 +92,7 @@ int main(){
 	cout << "Original Array : ";
 	obj.displayArray(nums);
 	int cnt=obj.team(nums,n);
-    cout << "\nThe number of inversions are: " << cnt << endl;    
+    cout << "\nThe number of Reverse Pairs are: " << cnt << endl;    
 	return 0;
 }
 
