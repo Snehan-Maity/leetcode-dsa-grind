@@ -11,25 +11,12 @@ struct TreeNode {
 
 class Solution {
 public:
-    vector<int> inorder(TreeNode* root){
-        stack<TreeNode*> st;
-        TreeNode* node = root;
-        vector<int> inorder;
-
-        while(true){
-            if(node != NULL){
-                st.push(node);
-                node = node->left;
-            }
-            else{
-                if(st.empty()) break;
-                node = st.top();
-                st.pop();
-                inorder.push_back(node->data);
-                node = node->right;
-            }
-        }
-        return inorder;
+    void inOrder(TreeNode* root, vector<int> &in){
+        if(!root)    return;
+        if(root->left)     inOrder(root->left);
+        in.emplace_back(root->val);
+        if(root->right)     inOrder(root->right);
+        return;
     }
 };
 
@@ -79,11 +66,12 @@ int main() {
     TreeNode* root = buildTree(arr);
 
     Solution sol;
-    vector<int> result = sol.inorder(root);
+    vector<int> in;
+    sol.inOrder(root, in);
 
     cout << "Inorder Traversal: ";
-    for(int val : result){
-        cout << val << " ";
+    for(const int &it : in){
+        cout << it << " ";
     }
     cout << endl;
 
