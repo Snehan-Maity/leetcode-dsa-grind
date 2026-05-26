@@ -8,28 +8,30 @@ struct TreeNode{
 };
 class Solution{
 public:
-    // Function to find node by value
-    TreeNode* findNode(TreeNode* root, int val){
-        if(!root) return NULL;
-
-        if(root->val == val)
-            return root;
-
-        TreeNode* left = findNode(root->left, val);
-        if(left) return left;
-
-        return findNode(root->right, val);
+    int widthOfBinaryTree(TreeNode* root) {
+        if (!root)  return 0;
+        int maxWidth = 0;
+        queue<pair<TreeNode*, int>> q;
+        q.push({root, 0});
+        while (!q.empty()) {
+            int size = q.size();
+            int minIndex = q.front().second;
+            int first = 0;
+            int last = 0;
+            for (int i = 0; i < size; i++) {
+                int currIndex = q.front().second - minIndex;
+                TreeNode* node = q.front().first;
+                q.pop();
+                if (i == 0)     first = currIndex;
+                if (i == size - 1)  last = currIndex;
+                if (node->left)     q.push({node->left, 2 * currIndex + 1});\
+                if (node->right)    q.push({node->right, 2 * currIndex + 2});
+            }
+            maxWidth = max(maxWidth, last - first + 1);
+        }
+        return maxWidth;
     }
-
-    TreeNode* lca(TreeNode* root, TreeNode*p, TreeNode*q){
-        if(!root || root==p || root==q)     return root;
-        TreeNode* left = lca(root->left, p, q);
-        TreeNode* right = lca(root->right, p, q);
-        if(!left)   return right;
-        else if(!right)   return left;
-        else    return root;
-    }
-
+    
     // Function to build tree from level order
     TreeNode* buildTree(vector<int>& arr) {
         if(arr.size() == 0 || arr[0] == -1) return NULL;
@@ -74,25 +76,9 @@ int main(){
         cin >> arr[i];
     }
 
-
     Solution sol;
     TreeNode* root = sol.buildTree(arr);
     
-    int x, y;
-    cout << "Enter the two node values to find LCA : ";
-    cin >> x >> y;
-
-    TreeNode* p = sol.findNode(root, x);
-    TreeNode* q = sol.findNode(root, y);
-
-    if(!p || !q){
-        cout << "One or both nodes not found!" << endl;
-        return 0;
-    }
-
-    TreeNode* result = sol.lca(root, p, q);
-
-    if(result)  cout << "Lowest Common Ancestor : " << result->val << endl;
-    else    cout << "Lowest Common Ancestor not found!" << endl;
+    cout << "Maximum Width if the Binary Tree : " <<  sol.widthOfBinaryTree(root) << endl;
     return 0;
 }
