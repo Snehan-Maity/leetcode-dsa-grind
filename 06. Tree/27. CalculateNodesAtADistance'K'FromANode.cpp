@@ -7,45 +7,63 @@ struct TreeNode{
     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
 };
 class Solution{
+private:
+    TreeNode* makeParentsAndReturnTargetNode(TreeNode* root, unordered_map<TreeNode*, TreeNode*> &parent_track, int target){
+        queue<TreeNode*> q;
+        TreeNode* targetNode;
+        q.push(root);
+        while(!q.empty()){
+            TreeNode* curr = q.front();
+            q.pop();
+            if(curr->val == target)     targetNode = curr;
+            if(curr->left){
+                parent_track[curr->left] = curr;
+                q.push(curr->left);
+            }
+            if(curr->right){
+                parent_track[curr->right] = curr;
+                q.push(curr->right);
+            }
+        }
+        return targetNode;
+    }
 public:
-    // Function to change the values of the nodes based on the sum of its children's values
-    void changeTree(TreeNode* root) {
-        if (!root)  return ;
-        int child = 0;
-        if (root->left)     child += root->left->val;
-        if (root->right)    child += root->right->val;
-        
-        // Compare the sum of children with the current node's value and update
-        if (child >= root->val)     root->val = child;
-        else{
-            // If the sum is smaller, update the child with the current node's value
-            if (root->left)     root->left->val = root->val;
-            else if(root->right)    root->right->val = root->val;
+    vector<int> distanceK(TreeNode* root, int target, int k){
+        unordered_map<TreeNode*, TreeNode*> parent_track;
+        TreeNode* targetNode = makeParentsAndReturnTargetNode(root, parent_track, target);
+        unordered_map<TreeNode*, bool> vis;
+        queue<TreeNode*> q;
+        q.push(targetNode);
+        vis[targetNode]=true;
+        int curr_level=0;
+        while(!q.empty()){
+            int sz = q.size();
+            if(curr_level++ == k)   break;
+            for(int i=0; i<sz; i++){
+                TreeNode* curr = q.front();
+                q.pop();
+                if(curr->left && !vis[curr->left]){
+                    q.push(curr->left);
+                    vis[curr->left]=true;
+                }
+                if(curr->right && !vis[curr->right]){
+                    q.push(curr->right);
+                    vis[curr->right]=true;
+                }
+                if(parent_track.count(curr) && !vis[parent_track[curr]]){
+                    q.push(parent_track[curr]);
+                    vis[parent_track[curr]]=true;
+                }
+            }
         }
-
-        // Recursively call the function on the left and right children
-        changeTree(root->left);
-        changeTree(root->right);
-
-        // Calculate the total sum of the values of the left and right children, if they exist
-        int tot = 0;
-        if(root->left)     tot += root->left->val;
-        if(root->right)     tot += root->right->val;
-
-        // If either left or right child exists, update the current node's value with the total sum
-        if (root->left or root->right)  root->val = tot;
-    }
-    
-    // Function to print the inorder traversal of the tree
-    void inorderTraversal(TreeNode* root) {
-        if (root == nullptr) {
-            return;
+        vector<int> res;
+        while(!q.empty()){
+            TreeNode* curr = q.front();
+            q.pop();
+            res.push_back(curr->val);
         }
-        inorderTraversal(root->left);
-        cout << root->val << " ";
-        inorderTraversal(root->right);
+        return res;
     }
-    
     // Function to build tree from level order
     TreeNode* buildTree(vector<int>& arr) {
         if(arr.size() == 0 || arr[0] == -1) return NULL;
@@ -86,22 +104,26 @@ int main(){
 
     vector<int> arr(n);
     cout << "Enter the tree nodes in level order (-1 for NULL): ";
-    for(int i = 0; i < n; i++){
+    for(int i=0; i<n; i++){
         cin >> arr[i];
     }
+
+    int targetVal;
+    cout << "Enter target node value: ";
+    cin >> targetVal;
+
+    int k;
+    cout << "Enter the distance k: ";
+    cin >> k;
 
     Solution sol;
     TreeNode* root = sol.buildTree(arr);
     
-    cout << "Binary Tree before modification: ";
-    sol.inorderTraversal(root);
+    vector<int> ans = sol.distanceK(root, targetVal, k);
+    cout << "Nodes at distance " << k << " from target " << targetVal << ": ";
+    for(const int &x : ans) {
+        cout << x << " ";
+    }
     cout << endl;
-
-    sol.changeTree(root);
-
-    cout << "Binary Tree after Children Sum Property: " ;
-    sol.inorderTraversal(root);
-    cout << endl;
-
     return 0;
 }
