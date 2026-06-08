@@ -36,7 +36,7 @@ public:
         TreeNode* root=new TreeNode(stoi(str));
         queue<TreeNode*> q;
         q.push(root);
-        while(!q.empty() && getline(ss, str, ',')){
+        while(!q.empty()){
             TreeNode* node=q.front();
             q.pop();
             getline(ss, str, ',');
